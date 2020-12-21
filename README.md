@@ -9,4 +9,4 @@ Install with `sudo apt install v4l2loopback-dkms`
 - Make script executable \
 `chmod +x ScreenToWebcam.sh`
 - Run script \
-`./ScreenToWebcam.sh`
+`./ScreenToWebcam.sh 1920x1080`
