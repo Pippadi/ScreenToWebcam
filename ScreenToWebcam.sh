@@ -16,4 +16,5 @@ if [ -z $outputRes ] ; then
 fi
 
 sudo modprobe v4l2loopback devices=1 exclusive_caps=1 card_label=ScreenToWebcam video_nr=10
+trap "sudo rmmod v4l2loopback" EXIT
 ffmpeg -f x11grab -video_size "$1" -i $DISPLAY -vf vflip -vf "scale=$outputRes,hflip,format=yuv420p" -c:a copy -f v4l2 /dev/video10
