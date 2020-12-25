@@ -27,6 +27,7 @@ class MainWindow(Gtk.Window):
 
         self.xlabel = Gtk.Label(label='x')
         self.grid.attach_next_to(self.xlabel, self.heightInput, Gtk.PositionType.RIGHT, 1, 1)
+
         self.widthInput = Gtk.Entry()
         self.widthInput.set_text("1080")
         self.grid.attach_next_to(self.widthInput, self.xlabel, Gtk.PositionType.RIGHT, 1, 1)
@@ -56,7 +57,7 @@ class MainWindow(Gtk.Window):
             self.widthInput.set_editable(True)
     
     def heightAndWidthOkay(self):
-        if (not self.heightInput.get_text().isnumeric()) or (not self.widthInput.get_text().isnumeric):
+        if (not self.heightInput.get_text().isnumeric()) or (not self.widthInput.get_text().isnumeric()):
             self.textLabel.set_label("The given dimensions to grab are not valid. Please enter valid ones.")
             return False
         else:
