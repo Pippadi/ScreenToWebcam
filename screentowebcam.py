@@ -1,18 +1,13 @@
 import subprocess, os, signal
 
 class ScreenToWebcam:
-    def start(self):
-        if not self.isRunning():
-            subprocess.check_call(['/home/prithvi/Projects/ScreenToWebcam/ScreenToWebcam.sh', 'start', '1680x1050'])
-        else:
-            print("Already running. Doing nothing.")
+    def start(self, height, width):
+        subprocess.check_call(['/home/prithvi/Projects/ScreenToWebcam/ScreenToWebcam.sh', 'start', '{}x{}'.format(height, width)])
     
     def stop(self):
-        if self.isRunning():
-            return subprocess.run(['/home/prithvi/Projects/ScreenToWebcam/ScreenToWebcam.sh', 'stop']).returncode == 0
-        else:
-            print("Nothing to stop. Doing nothing.")
-            return True
+        subprocess.run(['/home/prithvi/Projects/ScreenToWebcam/ScreenToWebcam.sh', 'stop'])
 
     def isRunning(self):
-        return subprocess.run(['/home/prithvi/Projects/ScreenToWebcam/ScreenToWebcam.sh', 'is-running']).returncode == 0
+        runChecker = subprocess.Popen(['/home/prithvi/Projects/ScreenToWebcam/ScreenToWebcam.sh', 'is-running'])
+        runChecker.wait()
+        return runChecker.returncode == 0
