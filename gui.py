@@ -18,10 +18,14 @@ class MainWindow(Gtk.Window):
         self.startStopBtn.connect("clicked", self.toggleRunning)
         self.box.pack_start(self.startStopBtn, True, True, 0)
 
+        self.textLabel = Gtk.Label(label="")
+        self.box.pack_start(self.textLabel, True, False, 10)
+
     def toggleRunning(self, button):
         print("Clicked")
         if s2w.isRunning():
             s2w.stop()
+            self.textLabel.set_label("Unable to remove ScreenToWebcam device. Close any program that may be using it and try again.")
         else:
             s2w.start()
         self.setBtnText(button)
@@ -32,6 +36,7 @@ class MainWindow(Gtk.Window):
             button.set_active(True)
         else:
             button.set_label("Start")
+            self.textLabel.set_label("")
             button.set_active(False)
 
 window = MainWindow()

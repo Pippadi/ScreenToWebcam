@@ -39,12 +39,16 @@ startS2W () {
 stopS2W () {
 	echo "Stopping ScreenToWebcam."
 	xargs kill -s SIGTERM < $ffmpegpidfile
-	rm $ffmpegpidfile
 	sudo modprobe -r v4l2loopback
+	modprobeExitCode=$?
+	if [ $modprobeExitCode -eq 0 ] ; then
+		rm $ffmpegpidfile
+	fi
+	exit $modprobeExitCode
 }
 
 isRunning () {
-	test -f $ffmpegpidfile
+	test -f $ffmpegpidfile && test -n $ffmpegpidfile
 }
 
 case $1 in
