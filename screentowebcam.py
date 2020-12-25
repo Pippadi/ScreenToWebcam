@@ -15,5 +15,4 @@ class ScreenToWebcam:
             return True
 
     def isRunning(self):
-        running = subprocess.run(['/home/prithvi/Projects/ScreenToWebcam/ScreenToWebcam.sh', 'is-running'])
-        return running.returncode == 0
+        return subprocess.run(['/home/prithvi/Projects/ScreenToWebcam/ScreenToWebcam.sh', 'is-running']).returncode == 0
