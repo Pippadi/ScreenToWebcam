@@ -10,27 +10,28 @@ s2w = ScreenToWebcam()
 class MainWindow(Gtk.Window):
     def __init__(self):
         Gtk.Window.__init__(self, title="Screen to Webcam")
-        self.set_default_size(300, 200)
+        self.set_default_size(200, 100)
         self.grid = Gtk.Grid()
         self.add(self.grid)
-
-        self.startStopBtn = Gtk.ToggleButton()
-        self.startStopBtn.connect("toggled", self.toggleRunning)
-        self.grid.add(self.startStopBtn)
-
-        self.textLabel = Gtk.Label(label="")
-        self.grid.attach_next_to(self.textLabel, self.startStopBtn, Gtk.PositionType.BOTTOM, 1, 3)
+        self.set_border_width(10)
 
         self.heightInput = Gtk.Entry()
         self.heightInput.set_text("1920")
-        self.grid.attach_next_to(self.heightInput, self.textLabel, Gtk.PositionType.BOTTOM, 1, 1)
+        self.grid.add(self.heightInput)
 
-        self.xlabel = Gtk.Label(label='x')
+        self.xlabel = Gtk.Label(label=' x ')
         self.grid.attach_next_to(self.xlabel, self.heightInput, Gtk.PositionType.RIGHT, 1, 1)
 
         self.widthInput = Gtk.Entry()
         self.widthInput.set_text("1080")
         self.grid.attach_next_to(self.widthInput, self.xlabel, Gtk.PositionType.RIGHT, 1, 1)
+
+        self.textLabel = Gtk.Label(label="")
+        self.grid.attach_next_to(self.textLabel, self.xlabel, Gtk.PositionType.BOTTOM, 3, 1)
+
+        self.startStopBtn = Gtk.ToggleButton()
+        self.startStopBtn.connect("toggled", self.toggleRunning)
+        self.grid.attach_next_to(self.startStopBtn, self.textLabel, Gtk.PositionType.BOTTOM, 3, 1)
 
         self.setWidgetText()
 
