@@ -19,7 +19,8 @@ class MainWindow(Gtk.Window):
         self.heightInput.set_text("1920")
         self.grid.add(self.heightInput)
 
-        self.xlabel = Gtk.Label(label=' x ')
+        self.xlabel = Gtk.Label()
+        self.xlabel.set_markup(" <big>×</big> ")
         self.grid.attach_next_to(self.xlabel, self.heightInput, Gtk.PositionType.RIGHT, 1, 1)
 
         self.widthInput = Gtk.Entry()
@@ -27,11 +28,12 @@ class MainWindow(Gtk.Window):
         self.grid.attach_next_to(self.widthInput, self.xlabel, Gtk.PositionType.RIGHT, 1, 1)
 
         self.textLabel = Gtk.Label(label="")
-        self.grid.attach_next_to(self.textLabel, self.xlabel, Gtk.PositionType.BOTTOM, 3, 1)
+        self.textLabel.set_justify(Gtk.Justification.FILL)
+        self.grid.attach_next_to(self.textLabel, self.widthInput, Gtk.PositionType.BOTTOM, 3, 1)
 
         self.startStopBtn = Gtk.ToggleButton()
         self.startStopBtn.connect("toggled", self.toggleRunning)
-        self.grid.attach_next_to(self.startStopBtn, self.textLabel, Gtk.PositionType.BOTTOM, 3, 1)
+        self.grid.attach_next_to(self.startStopBtn, self.textLabel, Gtk.PositionType.BOTTOM, 1, 1)
 
         self.setWidgetText()
 
@@ -41,7 +43,7 @@ class MainWindow(Gtk.Window):
             return
         if s2w.isRunning():
             s2w.stop()
-            self.textLabel.set_label("Unable to remove ScreenToWebcam device. Close any program that may be using it and try again.")
+            self.textLabel.set_label("Unable to remove ScreenToWebcam device.\nClose any program that may be using it and try again.")
         else:
             s2w.start(self.heightInput.get_text(), self.widthInput.get_text())
         self.setWidgetText()
