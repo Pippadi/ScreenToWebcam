@@ -2,7 +2,10 @@ import subprocess, os, signal
 
 class ScreenToWebcam:
     def start(self, height, width, mirror):
-        subprocess.check_call(['/home/prithvi/Projects/ScreenToWebcam/ScreenToWebcam.sh', 'start', ("-m" if mirror else ""), '{}x{}'.format(height, width)])
+        cmd = ['/home/prithvi/Projects/ScreenToWebcam/ScreenToWebcam.sh', 'start', '{}x{}'.format(height, width)]
+        if mirror:
+            cmd.insert(2, "-m")
+        subprocess.check_call(cmd)
     
     def stop(self):
         subprocess.run(['/home/prithvi/Projects/ScreenToWebcam/ScreenToWebcam.sh', 'stop'])

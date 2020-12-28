@@ -40,9 +40,10 @@ class MainWindow(Gtk.Window):
         self.grid.attach_next_to(self.startStopBtn, self.textLabel, Gtk.PositionType.BOTTOM, 1, 1)
 
         self.mirrorBtn = Gtk.CheckButton(label="Mirror")
+        self.mirrorBtn.connect("toggled", self.alertForRestart)
         self.grid.attach_next_to(self.mirrorBtn, self.startStopBtn, Gtk.PositionType.LEFT, 1, 1)
 
-        self.setWidgetText()
+        self.setWidgetStates()
 
     def toggleRunning(self, button):
         print("Clicked")
@@ -53,9 +54,9 @@ class MainWindow(Gtk.Window):
             self.textLabel.set_label("Unable to remove ScreenToWebcam device.\nClose any program that may be using it and try again.")
         else:
             s2w.start(self.heightInput.get_text(), self.widthInput.get_text(), self.mirrorBtn.get_active())
-        self.setWidgetText()
+        self.setWidgetStates()
 
-    def setWidgetText(self):
+    def setWidgetStates(self):
         if s2w.isRunning():
             self.startStopBtn.set_label("Stop")
             self.heightInput.set_editable(False)
@@ -73,6 +74,10 @@ class MainWindow(Gtk.Window):
         else:
             self.textLabel.set_label("")
             return True
+    
+    def alertForRestart(self, widget):
+        if s2w.isRunning():
+            self.textLabel.set_label("Stop and start ScreenToWebcam to apply changes.")
 
 window = MainWindow()
 window.connect("destroy", Gtk.main_quit)
