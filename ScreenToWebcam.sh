@@ -2,6 +2,7 @@
 
 usage="Usage: ./ScreenToWebcam  <command> [options]
 E.g. ./ScreenToWebcam start 1680x1050 1920x1080
+
 start:      Starts ScreenToWebcam
 stop:       Stops ScreenToWebcam
 is-running: Checks whether ScreenToWebcam is running or not.
@@ -9,13 +10,21 @@ is-running: Checks whether ScreenToWebcam is running or not.
 
 InputSize:  Required field for start
             Size of the screen to be grabbed
+			'1680x1050' in example given
 OutputRes:  Optional field for start
             Resolution the input will be scaled to in the output
-            Defaults to 720 columns, preserving the aspect ratio of InputSize"
+            Defaults to 720 columns, preserving the aspect ratio of InputSize
+			1920x1080 in example given"
 
 ffmpegpidfile="/tmp/s2wffmpegpid"
 
 startS2W () {
+	mirrorOpt=""
+	if [ $1 = "-m" ] || [ $1 = "--mirror" ] ; then
+		mirrorOpt="hflip,"
+		shift
+	fi
+
 	if [ -z $1 ] ; then
 		echo "$usage"
 		exit 1
@@ -31,8 +40,9 @@ startS2W () {
 	videoDevNums=($(find /dev/video* | sed -e "s|/dev/video||"))
 	loopbackNum=$((${videoDevNums[-1]} + 1))
 	pkexec /sbin/modprobe v4l2loopback devices=1 exclusive_caps=1 card_label=ScreenToWebcam video_nr=$loopbackNum
-	ffmpegCmd="ffmpeg -f x11grab -video_size $1 -i $DISPLAY -vf scale=$outputRes,hflip,format=yuv420p -r 15 -c:a copy -f v4l2 /dev/video$loopbackNum"
-	$ffmpegCmd &> /dev/null &
+	ffmpegCmd="ffmpeg -f x11grab -video_size $1 -i $DISPLAY -vf scale=$outputRes,${mirrorOpt}format=yuv420p -r 15 -c:a copy -f v4l2 /dev/video$loopbackNum"
+	#$ffmpegCmd &> /dev/null &
+	$ffmpegCmd &
 	echo $! > $ffmpegpidfile
 }
 
@@ -57,7 +67,7 @@ isRunning () {
 case $1 in
 	"start")
 		if ! isRunning ; then
-			startS2W "$2" "$3"
+			startS2W "$2" "$3" "$4"
 		else
 			echo "ScreenToWebcam already running. Doing nothing."
 		fi
