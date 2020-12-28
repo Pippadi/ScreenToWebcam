@@ -45,7 +45,7 @@ class MainWindow(Gtk.Window):
             s2w.stop()
             self.textLabel.set_label("Unable to remove ScreenToWebcam device.\nClose any program that may be using it and try again.")
         else:
-            s2w.start(self.heightInput.get_text(), self.widthInput.get_text())
+            s2w.start(self.heightInput.get_text(), self.widthInput.get_text(), True)
         self.setWidgetText()
 
     def setWidgetText(self):
