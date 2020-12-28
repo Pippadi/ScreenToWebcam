@@ -30,8 +30,8 @@ startS2W () {
 
 	videoDevNums=($(find /dev/video* | sed -e "s|/dev/video||"))
 	loopbackNum=$((${videoDevNums[-1]} + 1))
-	pkexec modprobe v4l2loopback devices=1 exclusive_caps=1 card_label=ScreenToWebcam video_nr=$loopbackNum
-	ffmpegCmd="ffmpeg -f x11grab -video_size $1 -i $DISPLAY -vf vflip -vf scale=$outputRes,hflip,format=yuv420p -r 15 -c:a copy -f v4l2 /dev/video$loopbackNum"
+	pkexec /sbin/modprobe v4l2loopback devices=1 exclusive_caps=1 card_label=ScreenToWebcam video_nr=$loopbackNum
+	ffmpegCmd="ffmpeg -f x11grab -video_size $1 -i $DISPLAY -vf scale=$outputRes,hflip,format=yuv420p -r 15 -c:a copy -f v4l2 /dev/video$loopbackNum"
 	$ffmpegCmd &> /dev/null &
 	echo $! > $ffmpegpidfile
 }
@@ -42,7 +42,7 @@ stopS2W () {
 		xargs kill -s SIGTERM < $ffmpegpidfile
 		tail --pid=$(cat $ffmpegpidfile) -f /dev/null
 	fi
-	pkexec modprobe -r v4l2loopback
+	pkexec /sbin/modprobe -r v4l2loopback
 	modprobeExitCode=$?
 	if [ $modprobeExitCode -eq 0 ] ; then
 		rm $ffmpegpidfile
