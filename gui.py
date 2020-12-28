@@ -15,9 +15,13 @@ class MainWindow(Gtk.Window):
         self.add(self.grid)
         self.set_border_width(10)
 
+        self.inputLabel = Gtk.Label(label="Dimensions of screen to capture")
+        self.inputLabel.set_justify(Gtk.Justification.RIGHT)
+        self.grid.add(self.inputLabel)
+
         self.heightInput = Gtk.Entry()
         self.heightInput.set_text("1920")
-        self.grid.add(self.heightInput)
+        self.grid.attach_next_to(self.heightInput, self.inputLabel, Gtk.PositionType.BOTTOM, 1, 1)
 
         self.xlabel = Gtk.Label()
         self.xlabel.set_markup(" <big>×</big> ")
@@ -35,6 +39,9 @@ class MainWindow(Gtk.Window):
         self.startStopBtn.connect("toggled", self.toggleRunning)
         self.grid.attach_next_to(self.startStopBtn, self.textLabel, Gtk.PositionType.BOTTOM, 1, 1)
 
+        self.mirrorBtn = Gtk.CheckButton(label="Mirror")
+        self.grid.attach_next_to(self.mirrorBtn, self.startStopBtn, Gtk.PositionType.LEFT, 1, 1)
+
         self.setWidgetText()
 
     def toggleRunning(self, button):
@@ -45,7 +52,7 @@ class MainWindow(Gtk.Window):
             s2w.stop()
             self.textLabel.set_label("Unable to remove ScreenToWebcam device.\nClose any program that may be using it and try again.")
         else:
-            s2w.start(self.heightInput.get_text(), self.widthInput.get_text(), True)
+            s2w.start(self.heightInput.get_text(), self.widthInput.get_text(), self.mirrorBtn.get_active())
         self.setWidgetText()
 
     def setWidgetText(self):
