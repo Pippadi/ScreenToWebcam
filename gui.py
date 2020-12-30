@@ -7,10 +7,15 @@ from screentowebcam import ScreenToWebcam
 
 s2w = ScreenToWebcam()
 
+class resEntry(Gtk.Entry):
+    def __init__(self, text):
+        Gtk.Entry.__init__(self)
+        self.set_width_chars(6)
+        self.set_text(text)
+
 class MainWindow(Gtk.Window):
     def __init__(self):
         Gtk.Window.__init__(self, title="Screen to Webcam")
-        self.set_default_size(200, 100)
         self.grid = Gtk.Grid()
         self.add(self.grid)
         self.set_border_width(10)
@@ -19,18 +24,14 @@ class MainWindow(Gtk.Window):
         self.inputLabel.set_justify(Gtk.Justification.LEFT)
         self.grid.attach(self.inputLabel, 1, 1, 3, 1)
 
-        self.heightInput = Gtk.Entry()
-        self.heightInput.set_text("1920")
-        self.heightInput.set_width_chars(6)
+        self.heightInput = resEntry("1920")
         self.grid.attach_next_to(self.heightInput, self.inputLabel, Gtk.PositionType.BOTTOM, 1, 1)
 
         self.xlabel = Gtk.Label()
         self.xlabel.set_markup(" <big>×</big> ")
         self.grid.attach_next_to(self.xlabel, self.heightInput, Gtk.PositionType.RIGHT, 1, 1)
 
-        self.widthInput = Gtk.Entry()
-        self.widthInput.set_text("1080")
-        self.widthInput.set_width_chars(6)
+        self.widthInput = resEntry("1080")
         self.grid.attach_next_to(self.widthInput, self.xlabel, Gtk.PositionType.RIGHT, 1, 1)
 
         self.textLabel = Gtk.Label(label="")
