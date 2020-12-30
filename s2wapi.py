@@ -11,6 +11,12 @@ class ScreenToWebcam:
         subprocess.run(['/home/prithvi/Projects/ScreenToWebcam/ScreenToWebcam.sh', 'stop'])
 
     def isRunning(self):
-        runChecker = subprocess.Popen(['/home/prithvi/Projects/ScreenToWebcam/ScreenToWebcam.sh', 'is-running'])
+        return self._checkReturncode0(['/home/prithvi/Projects/ScreenToWebcam/ScreenToWebcam.sh', 'is-running'])
+    
+    def isInUse(self):
+        return self._checkReturncode0(['/home/prithvi/Projects/ScreenToWebcam/ScreenToWebcam.sh', 'in-use'])
+    
+    def _checkReturncode0(self, cmd):
+        runChecker = subprocess.Popen(cmd)
         runChecker.wait()
         return runChecker.returncode == 0

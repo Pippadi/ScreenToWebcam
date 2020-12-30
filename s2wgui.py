@@ -49,12 +49,13 @@ class MainWindow(Gtk.Window):
         self.setWidgetStates()
 
     def toggleRunning(self, button):
-        print("Clicked")
         if not self.heightAndWidthOkay():
             return
         if s2w.isRunning():
-            s2w.stop()
-            self.textLabel.set_label("Unable to remove ScreenToWebcam device.\nClose any program that may be using it and try again.")
+            if s2w.isInUse():
+                self.textLabel.set_label("Unable to remove ScreenToWebcam device.\nClose any program that may be using it and try again.")
+            else:
+                s2w.stop()
         else:
             s2w.start(self.heightInput.get_text(), self.widthInput.get_text(), self.mirrorBtn.get_active())
         self.setWidgetStates()

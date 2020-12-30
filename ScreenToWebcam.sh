@@ -63,6 +63,10 @@ isRunning () {
 	test -f $ffmpegpidfile && test -n $ffmpegpidfile
 }
 
+inUse () {
+	test "$(lsmod | grep -e ^v4l2loopback | awk '{print $3}')" -ne 1
+}
+
 case $1 in
 	"start")
 		if ! isRunning ; then
@@ -80,6 +84,10 @@ case $1 in
 	;;
 	"is-running")
 		isRunning
+		exit $?
+	;;
+	"in-use")
+		inUse
 		exit $?
 	;;
 	*)
