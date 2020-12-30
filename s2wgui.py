@@ -3,7 +3,7 @@
 import gi
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
-from screentowebcam import ScreenToWebcam
+from s2wapi import ScreenToWebcam
 
 s2w = ScreenToWebcam()
 
