@@ -2,19 +2,19 @@ import subprocess, os, signal
 
 class ScreenToWebcam:
     def start(self, height, width, mirror):
-        cmd = ['/home/prithvi/Projects/ScreenToWebcam/ScreenToWebcam.sh', 'start', '{}x{}'.format(height, width)]
+        cmd = ['ScreenToWebcam', 'start', '{}x{}'.format(height, width)]
         if mirror:
             cmd.insert(2, "-m")
         subprocess.check_call(cmd)
     
     def stop(self):
-        subprocess.run(['/home/prithvi/Projects/ScreenToWebcam/ScreenToWebcam.sh', 'stop'])
+        subprocess.run(['ScreenToWebcam', 'stop'])
 
     def isRunning(self):
-        return self._checkReturncode0(['/home/prithvi/Projects/ScreenToWebcam/ScreenToWebcam.sh', 'is-running'])
+        return self._checkReturncode0(['ScreenToWebcam', 'is-running'])
     
     def isInUse(self):
-        return self._checkReturncode0(['/home/prithvi/Projects/ScreenToWebcam/ScreenToWebcam.sh', 'in-use'])
+        return self._checkReturncode0(['ScreenToWebcam', 'in-use'])
     
     def _checkReturncode0(self, cmd):
         runChecker = subprocess.Popen(cmd)
