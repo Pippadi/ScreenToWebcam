@@ -1,8 +1,8 @@
 import subprocess, os, signal
 
 class ScreenToWebcam:
-    def start(self, height, width, mirror):
-        cmd = ['ScreenToWebcam', 'start', '{}x{}'.format(height, width)]
+    def start(self, height, width, heightOffset, widthOffset, mirror):
+        cmd = ['/home/prithvi/Projects/ScreenToWebcam/ScreenToWebcam.sh', 'start', '{}x{}+{},{}'.format(height, width, heightOffset, widthOffset)]
         if mirror:
             cmd.insert(2, "-m")
         subprocess.check_call(cmd)

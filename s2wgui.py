@@ -21,14 +21,14 @@ class MainWindow(Gtk.Window):
         self.add(self.grid)
         self.set_border_width(10)
 
-        self.inputLabel = Gtk.Label(label="Dimensions to capture")
+        self.inputLabel = Gtk.Label(label="Screen to capture")
         self.inputLabel.set_justify(Gtk.Justification.LEFT)
-        self.grid.attach(self.inputLabel, 1, 1, 3, 1)
+        self.grid.attach(self.inputLabel, 1, 1, 1, 1)
 
-        self.resolutions = subprocess.check_output("xrandr | grep '*' | awk '{ print $1 }'", shell=True).decode().split()
+        self.displays = subprocess.check_output("xrandr | grep \" connected \" | awk '{ print $1 }'", shell=True).decode().split()
         self.resSelector = Gtk.ComboBoxText()
         self.resSelector.set_entry_text_column(0)
-        for res in self.resolutions:
+        for res in self.displays:
             self.resSelector.append_text(res)
         self.resSelector.set_active(0)
         self.grid.attach_next_to(self.resSelector, self.inputLabel, Gtk.PositionType.BOTTOM, 1, 1)
@@ -54,9 +54,15 @@ class MainWindow(Gtk.Window):
             else:
                 s2w.stop()
         else:
-            heightWidthList = self.resSelector.get_model()[self.resSelector.get_active_iter()][0].split('x')
-            print(heightWidthList)
-            s2w.start(heightWidthList[0], heightWidthList[1], self.mirrorBtn.get_active())
+            displaySelection = self.resSelector.get_model()[self.resSelector.get_active_iter()][0]
+            print(displaySelection)
+            resValsStr = subprocess.check_output("xrandr | grep %s | awk '{ print $3 }'" % (displaySelection), shell=True).decode()
+            dimensions = resValsStr.split('+', 1)[0].split('x')
+            offsets = resValsStr.split('+')[1:]
+            offsets[-1] = offsets[-1].strip()
+            print(dimensions)
+            print(offsets)
+            s2w.start(dimensions[0], dimensions[1], offsets[0], offsets[1], self.mirrorBtn.get_active())
         self.setWidgetStates()
 
     def setWidgetStates(self):
