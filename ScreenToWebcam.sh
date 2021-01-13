@@ -1,20 +1,21 @@
 #!/bin/bash
 
 usage="Usage: ./ScreenToWebcam  <command> [options] [values]
-E.g. ./ScreenToWebcam start 1680x1050 1920x1080
+E.g. ./ScreenToWebcam start --mirror 1680x1050 1920x1080
 
 start:      Starts ScreenToWebcam
 stop:       Stops ScreenToWebcam
 is-running: Checks whether ScreenToWebcam is running or not.
             Returns code 0 if running, else 1.
 
+-m,--mirror: Flip webcam feed horizontally
+
 InputSize:  Required field for start
             Size of the screen to be grabbed
             '1680x1050' in example given
 OutputRes:  Optional field for start
             Resolution the input will be scaled to in the output
-            Defaults to 720 columns, preserving the aspect ratio of InputSize
-            1920x1080 in example given"
+            Defaults to 1280x720"
 
 ffmpegpidfile="/tmp/s2wffmpegpid"
 
@@ -32,7 +33,7 @@ startS2W () {
 
 	outputRes=$( echo "$2" | sed -e s/x/:/ )
 	if [ -z $outputRes ] ; then
-		outputRes="-1:720"
+		outputRes="1280:720"
 	fi
 
 	echo "Starting ScreenToWebcam"
