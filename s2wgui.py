@@ -55,14 +55,14 @@ class MainWindow(Gtk.Window):
                 s2w.stop()
         else:
             displaySelection = self.resSelector.get_model()[self.resSelector.get_active_iter()][0]
-            print(displaySelection)
-            resValsStr = subprocess.check_output("xrandr | grep %s | awk '{ print $3 }'" % (displaySelection), shell=True).decode()
+            resValsStr = subprocess.check_output("xrandr | grep %s | sed -e 's/ primary//' | awk '{ print $3 }'" % (displaySelection), shell=True).decode()
             dimensions = resValsStr.split('+', 1)[0].split('x')
             offsets = resValsStr.split('+')[1:]
-            offsets[-1] = offsets[-1].strip()
-            print(dimensions)
-            print(offsets)
-            s2w.start(dimensions[0], dimensions[1], offsets[0], offsets[1], self.mirrorBtn.get_active())
+            if offsets != []:
+                offsets[-1] = offsets[-1].strip()
+                s2w.start(dimensions[0], dimensions[1], offsets[0], offsets[1], self.mirrorBtn.get_active())
+            else:
+                s2w.start(dimensions[0], dimensions[1], 0, 0, self.mirrorBtn.get_active())
         self.setWidgetStates()
 
     def setWidgetStates(self):

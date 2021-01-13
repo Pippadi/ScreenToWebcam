@@ -46,7 +46,7 @@ startS2W () {
 		loopbackNum=$((${videoDevNums[-1]} + 1))
 	fi
 	pkexec /sbin/modprobe v4l2loopback devices=1 exclusive_caps=1 card_label=ScreenToWebcam video_nr=$loopbackNum
-	ffmpegCmd="ffmpeg -f x11grab -video_size ${inputVals[0]} -i $DISPLAY.0${intputVals[1]} -vf scale=$outputRes,${mirrorOpt}format=yuv420p -r 15 -c:a copy -f v4l2 /dev/video$loopbackNum"
+	ffmpegCmd="ffmpeg -f x11grab -video_size ${inputVals[0]} -i $DISPLAY${inputVals[1]} -vf scale=$outputRes,${mirrorOpt}format=yuv420p -r 15 -c:a copy -f v4l2 /dev/video$loopbackNum"
 	$ffmpegCmd &> /dev/null &
 	echo $! > $ffmpegpidfile
 }
