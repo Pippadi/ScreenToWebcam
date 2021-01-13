@@ -4,10 +4,11 @@ import gi
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 from s2wapi import ScreenToWebcam
+import subprocess
 
 s2w = ScreenToWebcam()
 
-class resEntry(Gtk.Entry):
+class ResEntry(Gtk.Entry):
     def __init__(self, text):
         Gtk.Entry.__init__(self)
         self.set_width_chars(6)
@@ -24,15 +25,13 @@ class MainWindow(Gtk.Window):
         self.inputLabel.set_justify(Gtk.Justification.LEFT)
         self.grid.attach(self.inputLabel, 1, 1, 3, 1)
 
-        self.heightInput = resEntry("1920")
-        self.grid.attach_next_to(self.heightInput, self.inputLabel, Gtk.PositionType.BOTTOM, 1, 1)
-
-        self.xlabel = Gtk.Label()
-        self.xlabel.set_markup(" <big>×</big> ")
-        self.grid.attach_next_to(self.xlabel, self.heightInput, Gtk.PositionType.RIGHT, 1, 1)
-
-        self.widthInput = resEntry("1080")
-        self.grid.attach_next_to(self.widthInput, self.xlabel, Gtk.PositionType.RIGHT, 1, 1)
+        self.resolutions = subprocess.check_output("xrandr | grep '*' | awk '{ print $1 }'", shell=True).decode().split()
+        self.resSelector = Gtk.ComboBoxText()
+        self.resSelector.set_entry_text_column(0)
+        for res in self.resolutions:
+            self.resSelector.append_text(res)
+        self.resSelector.set_active(0)
+        self.grid.attach_next_to(self.resSelector, self.inputLabel, Gtk.PositionType.BOTTOM, 1, 1)
 
         self.textLabel = Gtk.Label(label="")
         self.textLabel.set_justify(Gtk.Justification.FILL)
@@ -45,19 +44,19 @@ class MainWindow(Gtk.Window):
         self.mirrorBtn = Gtk.CheckButton(label="Mirror")
         self.grid.attach(self.mirrorBtn, 1, 4, 1, 1)
 
-        self.settingsWidgets = [self.heightInput, self.widthInput, self.mirrorBtn]
+        self.settingsWidgets = [self.resSelector, self.mirrorBtn]
         self.setWidgetStates()
 
     def toggleRunning(self, button):
-        if not self.heightAndWidthOkay():
-            return
         if s2w.isRunning():
             if s2w.isInUse():
                 self.textLabel.set_label("Unable to remove ScreenToWebcam device.\nClose any program that may be using it and try again.")
             else:
                 s2w.stop()
         else:
-            s2w.start(self.heightInput.get_text(), self.widthInput.get_text(), self.mirrorBtn.get_active())
+            heightWidthList = self.resSelector.get_model()[self.resSelector.get_active_iter()][0].split('x')
+            print(heightWidthList)
+            s2w.start(heightWidthList[0], heightWidthList[1], self.mirrorBtn.get_active())
         self.setWidgetStates()
 
     def setWidgetStates(self):
@@ -72,14 +71,6 @@ class MainWindow(Gtk.Window):
     def setSettingsWidgetsEnabled(self, enabled):
         for sw in self.settingsWidgets:
             sw.set_sensitive(enabled)
-
-    def heightAndWidthOkay(self):
-        if (not self.heightInput.get_text().isnumeric()) or (not self.widthInput.get_text().isnumeric()):
-            self.textLabel.set_label("The given dimensions to grab are not valid. Please enter valid ones.")
-            return False
-        else:
-            self.textLabel.set_label("")
-            return True
 
 window = MainWindow()
 window.connect("destroy", Gtk.main_quit)
