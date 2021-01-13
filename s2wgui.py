@@ -22,8 +22,8 @@ class MainWindow(Gtk.Window):
         self.set_border_width(10)
 
         self.inputLabel = Gtk.Label(label="Screen to capture")
-        self.inputLabel.set_justify(Gtk.Justification.LEFT)
-        self.grid.attach(self.inputLabel, 1, 1, 1, 1)
+        self.inputLabel.set_justify(Gtk.Justification.CENTER)
+        self.grid.attach(self.inputLabel, 1, 1, 1, 2)
 
         self.displays = subprocess.check_output("xrandr | grep \" connected \" | awk '{ print $1 }'", shell=True).decode().split()
         self.resSelector = Gtk.ComboBoxText()
@@ -31,15 +31,15 @@ class MainWindow(Gtk.Window):
         for res in self.displays:
             self.resSelector.append_text(res)
         self.resSelector.set_active(0)
-        self.grid.attach_next_to(self.resSelector, self.inputLabel, Gtk.PositionType.BOTTOM, 1, 1)
+        self.grid.attach_next_to(self.resSelector, self.inputLabel, Gtk.PositionType.BOTTOM, 2, 1)
 
         self.textLabel = Gtk.Label(label="")
         self.textLabel.set_justify(Gtk.Justification.FILL)
-        self.grid.attach(self.textLabel, 1, 3, 3, 1)
+        self.grid.attach_next_to(self.textLabel, self.resSelector, Gtk.PositionType.BOTTOM, 2, 1)
 
         self.startStopBtn = Gtk.ToggleButton()
         self.startStopBtn.connect("toggled", self.toggleRunning)
-        self.grid.attach(self.startStopBtn, 3, 4, 1, 1)
+        self.grid.attach(self.startStopBtn, 2, 4, 1, 1)
 
         self.mirrorBtn = Gtk.CheckButton(label="Mirror")
         self.grid.attach(self.mirrorBtn, 1, 4, 1, 1)
