@@ -14,6 +14,12 @@ OutputRes:  Optional field for start
             Defaults to 1280x720"
 
 startS2W () {
+	if [ $XDG_SESSION_TYPE != "x11" ] ; then
+		printf "\033[31mYou don't appear to be using X11!\033[37m\n"
+		echo "Switch to X11/Xorg and try again."
+		exit 1
+	fi
+
 	mirrorOpt=""
 	if [ "$1" = "-m" ] || [ "$1" = "--mirror" ] ; then
 		mirrorOpt="hflip,"
