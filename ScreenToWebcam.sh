@@ -31,7 +31,15 @@ startS2W () {
 		exit 1
 	fi
 
+	read screenX screenY < <(xrandr --current | head -n 1 | awk 'BEGIN{ FS="," }{ print $2 }' | awk '{ FS=" " ; print $2 " " $4 }')
 	inputVals=(${1//+/ +})
+	read captureX captureY < <(echo ${inputVals[0]//x/ })
+
+	if [ $screenX -lt $captureX ] || [ $screenY -lt $captureY ] ; then
+		printf "\033[31mYour capture dimensions are bigger than your screen!\033[37m\n"
+		echo "Ensure your capture dimensions are within ${screenX}x${screenY}."
+		exit 1
+	fi
 
 	outputRes=$( echo "$2" | sed -e s/x/:/ )
 	if [ -z $outputRes ] ; then
