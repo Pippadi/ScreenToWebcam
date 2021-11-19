@@ -4,9 +4,9 @@ Grabs screen contents and sends to a virtual webcam.
 - `ffmpeg`
 - `v4l2loopback`
 ## Usage
-Clone repo and run script \
+Switch to Xorg/X11 if using Wayland. Clone repo and run script \
 `./ScreenToWebcam.sh [options]` \
-`./ScreenToWebcam.sh start [-m|--mirror] InputSize [OutputRes]` \
+`./ScreenToWebcam.sh [-m|--mirror] InputSize [OutputRes]` \
 Where `InputSize` is the rectangle of pixels grabbed from the top-left corner of the screen, and `OutputRes` the resolution of the webcam feed. `--mirror` sets whether the webcam feed should be horizontally flipped. \
 You will be prompted for your root password on start to initialize the v4l2loopback module, and on terminating to remove the module.
 ### Example
