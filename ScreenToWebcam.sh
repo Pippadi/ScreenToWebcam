@@ -1,15 +1,11 @@
 #!/bin/bash
 
-usage="Usage: ./ScreenToWebcam  <command> [options] [values]
-E.g. ./ScreenToWebcam start --mirror 1680x1050 1920x1080
-
-start:      Starts ScreenToWebcam
-stop:       Stops ScreenToWebcam
-is-running: Checks whether ScreenToWebcam is running or not.
-            Returns code 0 if running, else 1.
+usage="Usage: ./ScreenToWebcam  [options] [values]
+E.g. ./ScreenToWebcam --mirror 1680x1050 1920x1080
 
 -m,--mirror: Flip webcam feed horizontally
 
+-- Values --
 InputSize:  Required field for start
             Size of the screen to be grabbed
             '1680x1050' in example given
@@ -17,9 +13,13 @@ OutputRes:  Optional field for start
             Resolution the input will be scaled to in the output
             Defaults to 1280x720"
 
-ffmpegpidfile="/tmp/s2wffmpegpid"
-
 startS2W () {
+	if [ $XDG_SESSION_TYPE != "x11" ] ; then
+		printf "\033[31mYou don't appear to be using X11!\033[37m\n"
+		echo "Switch to X11/Xorg and try again."
+		exit 1
+	fi
+
 	mirrorOpt=""
 	if [ "$1" = "-m" ] || [ "$1" = "--mirror" ] ; then
 		mirrorOpt="hflip,"
@@ -31,75 +31,50 @@ startS2W () {
 		exit 1
 	fi
 
+	read screenX screenY < <(xrandr --current | head -n 1 | awk 'BEGIN{ FS="," }{ print $2 }' | awk '{ FS=" " ; print $2 " " $4 }')
 	inputVals=(${1//+/ +})
+	read captureX captureY < <(echo ${inputVals[0]//x/ })
+
+	if [ $screenX -lt $captureX ] || [ $screenY -lt $captureY ] ; then
+		printf "\033[31mYour capture dimensions are bigger than your screen!\033[37m\n"
+		echo "Ensure your capture dimensions are within ${screenX}x${screenY}."
+		exit 1
+	fi
 
 	outputRes=$( echo "$2" | sed -e s/x/:/ )
 	if [ -z $outputRes ] ; then
 		outputRes="1280:720"
 	fi
 
-	echo "Starting ScreenToWebcam"
+	printf "=========== Starting ScreenToWebcam ============\n"
+	printf "============= Press Ctrl-C to exit =============\n\n"
 
 	loopbackNum=0
-	if find /dev | grep video ; then
+	if find /dev | grep -q video ; then
 		videoDevNums=($(find /dev/video* | sed -e 's|/dev/video||'))
 		loopbackNum=$((${videoDevNums[*]: -1} + 1))
 	fi
 	pkexec /sbin/modprobe v4l2loopback devices=1 exclusive_caps=1 card_label=ScreenToWebcam video_nr=$loopbackNum
 	ffmpegCmd="ffmpeg -f x11grab -video_size ${inputVals[0]} -i $DISPLAY${inputVals[1]} -vf scale=$outputRes,${mirrorOpt}format=yuv420p -r 15 -c:a copy -f v4l2 /dev/video$loopbackNum"
-	$ffmpegCmd &> /dev/null &
-	echo $! > $ffmpegpidfile
-}
-
-stopS2W () {
-	echo "Stopping ScreenToWebcam."
-	if (xargs ps < $ffmpegpidfile) > /dev/null ; then
-		xargs kill -s SIGTERM < $ffmpegpidfile
-		tail --pid=$(cat $ffmpegpidfile) -f /dev/null
-	fi
-	pkexec /sbin/modprobe -r v4l2loopback
-	modprobeExitCode=$?
-	if [ $modprobeExitCode -eq 0 ] ; then
-		rm $ffmpegpidfile
-	fi
-	exit $modprobeExitCode
-}
-
-isRunning () {
-	test -f $ffmpegpidfile && test -n $ffmpegpidfile
+	printf "Starting ffmpeg.\n\n"
+	$ffmpegCmd > /dev/null
 }
 
 inUse () {
-	test "$(lsmod | grep -e ^v4l2loopback | awk '{print $3}')" -ne 1
+	test "$(lsmod | grep -e ^v4l2loopback | awk '{print $3}')" -gt 0
 }
 
-case $1 in
-	"start")
-		if ! isRunning ; then
-			startS2W "$2" "$3" "$4"
-		else
-			echo "ScreenToWebcam already running. Doing nothing."
-		fi
-	;;
-	"stop")
-		if inUse ; then
-			echo "ScreenToWebcam in use. Doing nothing."
-		elif isRunning ; then
-			stopS2W
-		else
-			echo "ScreenToWebcam not running. Doing nothing."
-		fi
-	;;
-	"is-running")
-		isRunning
-		exit $?
-	;;
-	"in-use")
-		inUse
-		exit $?
-	;;
-	*)
-		echo "$usage"
-		exit 1
-	;;
-esac
+stopS2W () {
+	printf "\n\n========== Stopping ScreenToWebcam ==========\n"
+	if ! inUse ; then
+		pkexec /sbin/modprobe -r v4l2loopback
+	else
+		printf "\033[31mStill in use! Close programs using it and try again.\033[37m\n\n"
+		while true ; do sleep 1 ; done
+	fi
+	exit $?
+}
+
+trap stopS2W SIGTERM
+trap stopS2W SIGINT
+startS2W $1 $2 $3
